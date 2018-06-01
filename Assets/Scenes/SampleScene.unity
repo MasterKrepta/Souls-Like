@@ -448,6 +448,7 @@ GameObject:
   - component: {fileID: 1278417186}
   - component: {fileID: 1278417190}
   - component: {fileID: 1278417189}
+  - component: {fileID: 1278417191}
   m_Layer: 0
   m_Name: Controller
   m_TagString: Untagged
@@ -513,6 +514,10 @@ MonoBehaviour:
   horizontal: 0
   moveAmount: 0
   moveDir: {x: 0, y: 0, z: 0}
+  rt: 0
+  rb: 0
+  lt: 0
+  lb: 0
   moveSpeed: 3.5
   runSpeed: 5.5
   rotSpeed: 9
@@ -520,12 +525,15 @@ MonoBehaviour:
   run: 0
   onGround: 0
   lockOn: 0
+  inAction: 0
+  canMove: 0
   anim: {fileID: 0}
-  rb: {fileID: 0}
+  rBody: {fileID: 0}
   delta: 0
   ignoreLayers:
     serializedVersion: 2
     m_Bits: 0
+  a_hook: {fileID: 0}
 --- !u!114 &1278417190
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -535,6 +543,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 229d8933f2c31034199ace8d83514f1f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1278417191
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1278417185}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e7d7d2dcbeaf5284cbdb085534ea17cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1001 &1363975238
