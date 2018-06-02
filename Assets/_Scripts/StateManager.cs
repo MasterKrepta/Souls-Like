@@ -116,13 +116,13 @@ public class StateManager : MonoBehaviour {
         if (run) 
             lockOn = false;
         
-        Vector3 targetDir = (lockOnTarget == false)? moveDir 
+        Vector3 targetDir = (lockOn == false)? moveDir 
             : lockOnTarget.transform.position - transform.position;
 
         targetDir.y = 0;
         if (targetDir == Vector3.zero) 
             targetDir = transform.forward;
-        
+
         Quaternion tr = Quaternion.LookRotation(targetDir);
         Quaternion targetRot = Quaternion.Slerp(transform.rotation, tr, delta * moveAmount * rotSpeed);
         transform.rotation = targetRot;

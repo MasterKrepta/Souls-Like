@@ -755,10 +755,12 @@ MonoBehaviour:
   rb: 0
   lt: 0
   lb: 0
+  rollInput: 0
   moveSpeed: 3.5
   runSpeed: 5.5
   rotSpeed: 9
   toGround: 0.5
+  rollSpeed: 1
   run: 0
   onGround: 0
   lockOn: 0
@@ -795,6 +797,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e7d7d2dcbeaf5284cbdb085534ea17cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rm_Multiplier: 1
 --- !u!1001 &1363975238
 Prefab:
   m_ObjectHideFlags: 0
