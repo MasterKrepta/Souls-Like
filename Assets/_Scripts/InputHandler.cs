@@ -18,6 +18,9 @@ public class InputHandler : MonoBehaviour {
     float lt_axis;
     bool lt_input;
 
+    bool leftAxis_down;
+    bool rightAxis_down;
+
 
     StateManager states;
     CameraManager cameraManager;
@@ -69,6 +72,8 @@ public class InputHandler : MonoBehaviour {
         rb_input = Input.GetButton("RB");
         lb_input = Input.GetButton("LB");
 
+        rightAxis_down = Input.GetButtonUp("L");
+        
     }
 
     void UpdateStates() {
@@ -82,10 +87,11 @@ public class InputHandler : MonoBehaviour {
         float m = Mathf.Abs(horizontal) + Mathf.Abs(vertical);
         states.moveAmount = Mathf.Clamp01(m);
 
+        states.rollInput = b_input;
         if (b_input) {
-            states.run = (states.moveAmount > 0);
+            //states.run = (states.moveAmount > 0);
         }  else {
-            states.run = false;
+            //states.run = false;
         }
 
         states.rt = rt_input;
@@ -98,8 +104,16 @@ public class InputHandler : MonoBehaviour {
             states.isTwoHanded = !states.isTwoHanded;
             states.HandleTwoHanded();
         }
-        
 
+        if (rightAxis_down) {
+            
+            states.lockOn = !states.lockOn;
+
+            if(states.lockOnTarget == null)
+                states.lockOn = false;
+            cameraManager.lockOnTarget = states.lockOnTarget.transform;
+            cameraManager.lockOn = states.lockOn;
+        }
              
 
     }

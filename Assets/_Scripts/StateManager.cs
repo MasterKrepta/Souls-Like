@@ -12,14 +12,14 @@ public class StateManager : MonoBehaviour {
     public float moveAmount;
     public Vector3 moveDir;
     public bool rt, rb, lt, lb;
-    
+    public bool rollInput;
 
     [Header("Stats")]
     public float moveSpeed = 3;
     public float runSpeed = 3.5f;
     public float rotSpeed = 5;
     public float toGround = .5f;
-    
+    public float rollSpeed = 1;
     
 
     [Header("States")]
@@ -29,6 +29,10 @@ public class StateManager : MonoBehaviour {
     public bool inAction;
     public bool canMove;
     public bool isTwoHanded;
+    
+
+    [Header("Other")]
+    public EnemyTarget lockOnTarget;
 
     [HideInInspector]
     public Animator anim;
@@ -88,16 +92,17 @@ public class StateManager : MonoBehaviour {
             }
             
         }
-            
         
-
         canMove = anim.GetBool("canMove");
 
         if (!canMove)
             return;
 
-        anim.applyRootMotion = false;
+        a_hook.rm_Multiplier = 1;
+        HandleRolls();
+        
 
+        anim.applyRootMotion = false;
         rBody.drag = (moveAmount > 0 || onGround == false) ? 0 : 4;
 
         float targetSpeed = moveSpeed;
@@ -108,25 +113,32 @@ public class StateManager : MonoBehaviour {
         if (onGround) {
             rBody.velocity = moveDir * (targetSpeed * moveAmount);
         }
-        if (run) {
+        if (run) 
             lockOn = false;
+        
+        Vector3 targetDir = (lockOnTarget == false)? moveDir 
+            : lockOnTarget.transform.position - transform.position;
+
+        targetDir.y = 0;
+        if (targetDir == Vector3.zero) 
+            targetDir = transform.forward;
+        
+        Quaternion tr = Quaternion.LookRotation(targetDir);
+        Quaternion targetRot = Quaternion.Slerp(transform.rotation, tr, delta * moveAmount * rotSpeed);
+        transform.rotation = targetRot;
+
+        anim.SetBool("lockOn", lockOn);
+
+        //TODO Debug this, we are stuck in lockon animations no matter what
+        if (lockOn == false) {
+            Debug.Log("Do normal");
+            HandleMovementAnimations();
+        }
+        else {
+            Debug.Log("Do lockon");
+            HandleLockOnAnimations(moveDir);
         }
             
-
-        if (!lockOn) {
-            Vector3 targetDir = moveDir;
-            targetDir.y = 0;
-            if (targetDir == Vector3.zero) {
-                targetDir = transform.forward;
-            }
-
-            Quaternion tr = Quaternion.LookRotation(targetDir);
-            Quaternion targetRot = Quaternion.Slerp(transform.rotation, tr, delta * moveAmount * rotSpeed);
-            transform.rotation = targetRot;
-        }
-        
-
-        HandleMovementAnimations();
     }
 
     public void DetectAction() {
@@ -157,6 +169,50 @@ public class StateManager : MonoBehaviour {
         //rBody.velocity = Vector3.zero;
     }
 
+    public void HandleRolls() {
+        if (!rollInput)
+            return;
+
+        float v = vertical;
+        float h = horizontal;
+        v = (moveAmount > 0.3f) ? 1 : 0;
+        h = 0;
+
+
+        //if (!lockOn) {
+        //    v = (moveAmount > 0.3f)? 1 : 0;
+        //    h = 0;
+        //}
+        //else {
+        //    //remove small amounts of inputs
+        //    if(Mathf.Abs(v) < 0.3f) 
+        //        v = 0;
+        //    if (Mathf.Abs(h) < 0.3f)
+        //        h = 0;
+
+        //}
+
+        //HACK
+
+        if(v != 0){
+
+            if (moveDir == Vector3.zero)
+                moveDir = transform.forward;
+
+            Quaternion targetRot = Quaternion.LookRotation(moveDir);
+            transform.rotation = targetRot;
+        }
+
+        a_hook.rm_Multiplier = rollSpeed;
+
+        anim.SetFloat("vertical", v);
+        anim.SetFloat("horizontal", h);
+
+        canMove = false;
+        inAction = true;
+        anim.CrossFade("Rolls", 0.2f);
+
+    }
     public void Tick(float d) {
         delta = d;
         onGround = OnGround();
@@ -166,6 +222,16 @@ public class StateManager : MonoBehaviour {
     void HandleMovementAnimations() {
         anim.SetBool("run", run);
         anim.SetFloat("vertical", moveAmount, 0.4f, delta);
+
+    }
+
+    void HandleLockOnAnimations(Vector3 moveDir) {
+        Vector3 relativeDir = transform.InverseTransformDirection(moveDir);
+        float h = relativeDir.x;
+        float v = relativeDir.z;
+
+        anim.SetFloat("vertical", v, 0.2f, delta);
+        anim.SetFloat("horizontal", h, 0.2f, delta);
 
     }
 
